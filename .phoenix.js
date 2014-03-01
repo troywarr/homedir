@@ -53,6 +53,10 @@ api.bind('1', mash, function() {
   forApp("Atom", function(win) {
     win.toGrid(0, 0, 0.5, 0.7);
   });
+
+  forApp("GitX", function(win) {
+    win.toGrid(0.2, 0.2, 0.6, 0.6);
+  });
 });
 
 api.bind('2', mash, function() {
