@@ -87,7 +87,7 @@ Window.prototype.toGrid = function(x, y, width, height) {
     height: Math.round(height * screen.height) - 2*padding
   });
 
-  this.focusWindow();
+  // this.focusWindow();
 
   return this;
 }
