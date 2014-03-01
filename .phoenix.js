@@ -38,7 +38,7 @@ api.bind('right', mash, function() {
 
 api.bind('1', mash, function() {
   api.alert("Layout 1", 0.5);
-  forApp("GoogleChrome", function(win) {
+  forApp("Google Chrome", function(win) {
     win.toRightHalf();
   });
 
