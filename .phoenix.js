@@ -139,11 +139,9 @@ App.prototype.firstWindow = function() {
 }
 
 function forApp(name, f) {
-  var app, win;
+  var app = App.byTitle(name);
 
-  if (app = App.byTitle(name)) {
-    if (win = app.firstWindow()) {
-      f(win);
-    }
+  if (app) {
+    _.each(app.visibleWindows(), f);
   }
 }
