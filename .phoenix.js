@@ -36,23 +36,39 @@ api.bind('right', mash, function() {
   Window.focusedWindow().toRightHalf();
 });
 
-api.bind('escape', mash, function() {
-  Window.focusedWindow().toLastFrame();
-});
-
 api.bind('1', mash, function() {
   api.alert("Layout 1", 0.5);
-  App.byTitle("Google Chrome").firstWindow().toRightHalf();
-  App.byTitle("Terminal").firstWindow().toGrid(0, 0.7, 0.5, 0.3);
-  App.byTitle("Sublime Text").firstWindow().toGrid(0, 0, 0.5, 0.7);
-  App.byTitle("Atom").firstWindow().toGrid(0, 0, 0.5, 0.7);
+  forApp("GoogleChrome", function(win) {
+    win.toRightHalf();
+  });
+
+  forApp("Terminal", function(win) {
+    win.toGrid(0, 0.7, 0.5, 0.3);
+  });
+
+  forApp("Sublime Text", function(win) {
+    win.toGrid(0, 0, 0.5, 0.7);
+  });
+
+  forApp("Atom", function(win) {
+    win.toGrid(0, 0, 0.5, 0.7);
+  });
 });
 
 api.bind('2', mash, function() {
   api.alert("Layout 2", 0.5);
-  App.byTitle("Terminal").firstWindow().toRightHalf();
-  App.byTitle("Sublime Text").firstWindow().toLeftHalf();
-  App.byTitle("Atom").firstWindow().toLeftHalf();
+
+  forApp("Terminal", function(win) {
+    win.toRightHalf();
+  })
+
+  forApp("Sublime Text", function(win) {
+    win.toLeftHalf();
+  })
+
+  forApp("Atom", function(win) {
+    win.toLeftHalf();
+  })
 });
 
 
@@ -63,8 +79,6 @@ var lastFrames = {};
 
 Window.prototype.toGrid = function(x, y, width, height) {
   var screen = this.screen().frameWithoutDockOrMenu();
-
-  this.rememberFrame();
 
   this.setFrame({
     x:      Math.round(x * screen.width)       + padding    + screen.x,
@@ -79,7 +93,13 @@ Window.prototype.toGrid = function(x, y, width, height) {
 }
 
 Window.prototype.toFullScreen = function() {
-  return this.toGrid(0, 0, 1, 1);
+  if (lastFrames[this]) {
+    this.setFrame(lastFrames[this]);
+    lastFrames[this] = null;
+  } else {
+    this.rememberFrame();
+    return this.toGrid(0, 0, 1, 1);
+  }
 }
 
 Window.prototype.toTopHalf = function() {
@@ -102,15 +122,6 @@ Window.prototype.rememberFrame = function() {
   lastFrames[this] = this.frame();
 }
 
-Window.prototype.toLastFrame = function() {
-  var lastFrame = lastFrames[this];
-  if (lastFrame) {
-    this.rememberFrame();
-    this.setFrame(lastFrame);
-  }
-  return this;
-}
-
 App.byTitle = function(title) {
   var apps = this.runningApps();
 
@@ -125,4 +136,14 @@ App.byTitle = function(title) {
 
 App.prototype.firstWindow = function() {
   return this.visibleWindows()[0];
+}
+
+function forApp(name, f) {
+  var app, win;
+
+  if (app = App.byTitle(name)) {
+    if (win = app.firstWindow()) {
+      f(win);
+    }
+  }
 }
