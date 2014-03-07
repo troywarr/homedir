@@ -95,7 +95,7 @@ Window.prototype.toGrid = function(x, y, width, height) {
 Window.prototype.toFullScreen = function() {
   if (lastFrames[this]) {
     this.setFrame(lastFrames[this]);
-    lastFrames[this] = null;
+    this.forgetFrame();
   } else {
     this.rememberFrame();
     return this.toGrid(0, 0, 1, 1);
@@ -120,6 +120,10 @@ Window.prototype.toRightHalf = function() {
 
 Window.prototype.rememberFrame = function() {
   lastFrames[this] = this.frame();
+}
+
+Window.prototype.forgetFrame = function() {
+  delete lastFrames[this];
 }
 
 App.byTitle = function(title) {
