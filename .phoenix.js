@@ -81,28 +81,32 @@ api.bind('2', mash, function() {
 
 var lastFrames = {};
 
-Window.prototype.toGrid = function(x, y, width, height) {
+Window.prototype.calculateGrid = function(x, y, width, height) {
   var screen = this.screen().frameWithoutDockOrMenu();
 
-  this.setFrame({
+  return {
     x:      Math.round(x * screen.width)       + padding    + screen.x,
     y:      Math.round(y * screen.height)      + padding    + screen.y,
     width:  Math.round(width * screen.width)   - 2*padding,
     height: Math.round(height * screen.height) - 2*padding
-  });
+  };
+}
 
-  // this.focusWindow();
-
+Window.prototype.toGrid = function(x, y, width, height) {
+  var rect = this.calculateGrid(x, y, width, height);
+  this.setFrame(rect);
   return this;
 }
 
 Window.prototype.toFullScreen = function() {
-  if (lastFrames[this]) {
-    this.setFrame(lastFrames[this]);
-    this.forgetFrame();
-  } else {
+  var fullFrame = this.calculateGrid(0, 0, 1, 1);
+
+  if (!_.isEqual(this.frame(), fullFrame)) {
     this.rememberFrame();
     return this.toGrid(0, 0, 1, 1);
+  } else if (lastFrames[this]) {
+    this.setFrame(lastFrames[this]);
+    this.forgetFrame();
   }
 }
 
